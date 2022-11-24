@@ -45,6 +45,22 @@ df_frequencyPerBall.to_csv("out.csv")
 df_frequencyPerBall.plot.bar(rot=15, title="Frequency Per Lottery Ball)");
 plot.show(block=True);
 
+# Restructure data frame to give us the Expected/Observed table shown on the blog - use crosstab
+df_frequencyPerBall.reset_index(inplace=True)
+df_expected = df_frequencyPerBall[['ball']].copy()
+df_expected['value']=449
+df_expected['type'] = 'Expected'
+df_expected = df_expected[['ball','value', 'type']]
+df_observed = df_frequencyPerBall[['ball','frequency']].copy()
+df_observed['type'] = 'Observed'
+df_observed.rename(columns = {'frequency':'value'}, inplace = True)
+
+# Union observed and Expected
+df_toPivot= pd.concat([df_expected,df_observed])
+
+# Crosstab
+df_crosstab=pd.crosstab(index = df_toPivot.type, columns = df_toPivot.ball,values =df_toPivot.value, aggfunc = 'sum')
+#print(df_crosstab)
 
 #############################################
 ## Prepare Data for Chi Squared Testing
